@@ -38,3 +38,19 @@ validate ctx t = case t of
                 (Left "validate var")
                 (\_ -> Right ())
                 (splitTwo (TypeVar x) ctx)
+        Type.Ext x -> do
+            let se = hasSolvedExt x ctx
+            case (hasSolvedExt x ctx, splitTwo (UnsolvedExt x) ctx ) of
+                (True, _) -> Right ()
+                (_, Just _) -> Right ()
+                _ -> Left "validate ext"
+    Type.Forall x t -> validate (TypeVar x:ctx) t
+    Type.PolyArrow t1 t2 -> do
+        validate ctx t1
+        validate ctx t2
+
+hasSolvedExt :: Type.ExtId -> Ctx -> Bool
+hasSolvedExt x ctx = case ctx of
+    (SolvedExt y _:_) | x == y -> True
+    (_:ctx) -> hasSolvedExt x ctx
+    [] -> False
