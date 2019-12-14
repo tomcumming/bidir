@@ -54,3 +54,9 @@ hasSolvedExt x ctx = case ctx of
     (SolvedExt y _:_) | x == y -> True
     (_:ctx) -> hasSolvedExt x ctx
     [] -> False
+
+apply :: Ctx -> Type.Poly -> Type.Poly
+apply ctx t = case ctx of
+    (SolvedExt x t2:ctx) -> apply ctx (Type.applySub t x (Type.asPoly t2))
+    (_:ctx) -> apply ctx t
+    [] -> t

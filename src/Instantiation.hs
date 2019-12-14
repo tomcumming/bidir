@@ -1,4 +1,4 @@
-module Instantiation where
+module Instantiation (InstError, instLeft) where
 
 import Control.Monad (when)
 import Control.Monad.Trans (lift)
@@ -13,9 +13,15 @@ type InstError = String
 instLeft :: Ctx -> Type.ExtId -> Type.Poly -> TI Ctx
 instLeft ctx x t = case t of
     Type.Forall y t -> instForallL ctx x y t
-    Type.PolyArrow t1 t2 -> lift $ Left "Arrow"
+    Type.PolyArrow t1 t2 -> instLArr ctx x t1 t2
     Type.PolyAtom (Type.Ext y) -> lift $ instExtExt ctx x y
     Type.PolyAtom t -> lift $ instAtom ctx x t
+
+instRight :: Ctx -> Type.Poly -> Type.ExtId -> TI Ctx
+instRight ctx t x = case t of
+    Type.PolyAtom (Type.Ext y) -> lift $ instExtExt ctx x y
+    Type.PolyAtom t -> lift $ instAtom ctx x t
+    _ -> error "todo instR"
 
 instExtExt :: Ctx -> Type.ExtId -> Type.ExtId -> Either InstError Ctx
 instExtExt ctx a b = do
@@ -50,3 +56,22 @@ instForallL ctx x y t = do
         (splitTwo (Context.TypeVar y) ctx2)
     return ctx4
 
+instLArr :: Ctx -> Type.ExtId -> Type.Poly -> Type.Poly -> TI Ctx
+instLArr ctx x t1 t2 = do
+    (ctx1, ctx2) <- lift $ maybe
+        (Left "instLArr")
+        Right
+        (splitTwo (Context.UnsolvedExt x) ctx)
+    ta <- fresh
+    tr <- fresh
+    let ctx3 = ctx1
+                ++ [Context.SolvedExt
+                    x
+                    (Type.MonoArrow
+                        (Type.MonoAtom (Type.Ext ta))
+                        (Type.MonoAtom (Type.Ext tr)))]
+                ++ [Context.UnsolvedExt ta]
+                ++ [Context.UnsolvedExt tr]
+                ++ ctx2
+    ctx4 <- instRight ctx3 t1 ta
+    instLeft ctx4 tr (Context.apply ctx4 t2)

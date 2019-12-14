@@ -19,3 +19,15 @@ data Poly =
   | Forall Id Poly
   | PolyArrow Poly Poly
   deriving (Show, Eq)
+
+asPoly :: Mono -> Poly
+asPoly t = case t of
+    MonoAtom t -> PolyAtom t
+    MonoArrow t1 t2 -> PolyArrow (asPoly t1) (asPoly t2)
+
+applySub :: Poly -> ExtId -> Poly -> Poly
+applySub t x t2 = case t of
+    PolyAtom (Ext y) | x == y -> t2
+    PolyAtom _ -> t
+    Forall y t -> Forall y (applySub t x t2)
+    PolyArrow ta tr -> PolyArrow (applySub ta x t2) (applySub tr x t2)
