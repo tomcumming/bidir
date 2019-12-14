@@ -14,6 +14,7 @@ tests = hspec $ do
         instLAllR
         instLArr
         instRAllL
+        instRArr
 
 runInstL :: Context.Ctx -> Type.ExtId -> Type.Poly -> Either String Context.Ctx
 runInstL ctx x t = evalStateT (instLeft ctx x t) 10
@@ -119,3 +120,29 @@ instRAllL = do
                         ]
         let pt = Type.Forall beta (Type.PolyAtom Type.Unit)
         runInstR ctx pt alpha `shouldBe` Right ctxOut
+
+instRArr = do
+    it "handles InstRArr" $ do
+        let alpha = 1 -- :: freshA -> freshR
+        let freshR = 11
+        let freshA = 10
+        let ctx = [
+                    Context.TypeVar "x",
+                    Context.UnsolvedExt alpha,
+                    Context.TypeVar "a",
+                    Context.TypeVar "y"
+                    ]
+        let ctxOut = [
+                        Context.TypeVar "x",
+                        Context.SolvedExt
+                            alpha
+                            (Type.MonoArrow
+                                (Type.MonoAtom (Type.Ext freshA))
+                                (Type.MonoAtom (Type.Ext freshR))),
+                        Context.SolvedExt freshA (Type.MonoAtom (Type.Var "a")),
+                        Context.SolvedExt freshR (Type.MonoAtom Type.Unit),
+                        Context.TypeVar "a",
+                        Context.TypeVar "y"
+                        ]
+        let pt = Type.PolyArrow (Type.PolyAtom (Type.Var "a")) (Type.PolyAtom Type.Unit)
+        runInstR ctx pt alpha  `shouldBe` Right ctxOut

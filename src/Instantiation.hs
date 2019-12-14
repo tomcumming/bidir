@@ -20,9 +20,9 @@ instLeft ctx x t = case t of
 instRight :: Ctx -> Type.Poly -> Type.ExtId -> TI Ctx
 instRight ctx t x = case t of
     Type.Forall y t -> instRAllL ctx y t x
+    Type.PolyArrow t1 t2 -> instRArr ctx t1 t2 x
     Type.PolyAtom (Type.Ext y) -> lift $ instExtExt ctx x y
     Type.PolyAtom t -> lift $ instAtom ctx x t
-    _ -> error "todo instR"
 
 instExtExt :: Ctx -> Type.ExtId -> Type.ExtId -> Either InstError Ctx
 instExtExt ctx a b = do
@@ -88,3 +88,23 @@ instRAllL ctx y t x = do
         Right
         (splitTwo (Context.Marker beta) ctx3)
     return ctx4
+
+instRArr :: Ctx -> Type.Poly -> Type.Poly -> Type.ExtId -> TI Ctx
+instRArr ctx t1 t2 x  = do
+    (ctx1, ctx2) <- lift $ maybe
+        (Left "instRArr")
+        Right
+        (splitTwo (Context.UnsolvedExt x) ctx)
+    ta <- fresh
+    tr <- fresh
+    let ctx3 = ctx1
+                ++ [Context.SolvedExt
+                    x
+                    (Type.MonoArrow
+                        (Type.MonoAtom (Type.Ext ta))
+                        (Type.MonoAtom (Type.Ext tr)))]
+                ++ [Context.UnsolvedExt ta]
+                ++ [Context.UnsolvedExt tr]
+                ++ ctx2
+    ctx4 <- instLeft ctx3 ta t1
+    instRight ctx4 (Context.apply ctx4 t2) tr
