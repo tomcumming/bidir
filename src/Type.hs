@@ -34,6 +34,14 @@ applySub t x t2 = case t of
     Forall y t -> Forall y (applySub t x t2)
     PolyArrow ta tr -> PolyArrow (applySub ta x t2) (applySub tr x t2)
 
+applyVarSub ::Poly -> Id -> Poly -> Poly
+applyVarSub t x t2 = case t of
+    PolyAtom (Var y) | x == y -> t2
+    PolyAtom _ -> t
+    Forall y t | x == y -> Forall y t
+    Forall y t -> Forall y (applyVarSub t x t2)
+    PolyArrow ta tr -> PolyArrow (applyVarSub ta x t2) (applyVarSub tr x t2)
+
 free :: Poly -> Set.Set ExtId
 free t = case t of
     PolyAtom t -> case t of

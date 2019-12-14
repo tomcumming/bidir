@@ -82,7 +82,7 @@ instRAllL ctx y t x = do
     lift $ when (splitTwo (Context.UnsolvedExt x) ctx == Nothing) (Left "instRAllL")
     beta <- fresh
     let ctx2 = Context.UnsolvedExt beta:Context.Marker beta:ctx
-    ctx3 <- instRight ctx2 (Context.apply ctx2 t) x
+    ctx3 <- instRight ctx2 (Type.applyVarSub t y (Type.PolyAtom (Type.Ext beta))) x
     (_, ctx4) <- lift $ maybe
         (Left "instRAllL")
         Right
