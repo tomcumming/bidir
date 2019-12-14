@@ -1,5 +1,7 @@
 module Type where
 
+import qualified Data.Set as Set
+
 type Id = String
 type ExtId = Int
 
@@ -31,3 +33,12 @@ applySub t x t2 = case t of
     PolyAtom _ -> t
     Forall y t -> Forall y (applySub t x t2)
     PolyArrow ta tr -> PolyArrow (applySub ta x t2) (applySub tr x t2)
+
+free :: Poly -> Set.Set ExtId
+free t = case t of
+    PolyAtom t -> case t of
+        Unit -> Set.empty
+        Var _ -> Set.empty
+        Ext x -> Set.singleton x
+    Forall _ t -> free t
+    PolyArrow t1 t2 -> free t1 `Set.union` free t2
