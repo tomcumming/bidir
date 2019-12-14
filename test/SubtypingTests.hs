@@ -20,6 +20,7 @@ tests = hspec $ do
         testInstL
         testInstR
         testForallR
+        testForallL
 
 testUnitUnit = it "handles unit unit" $ do
     let ctx = [Context.TypeVar "a"]
@@ -124,3 +125,10 @@ testForallR = do
         let t2 = Type.Forall "a" t1
         let ctx = [ Context.TypeVar "c" ]
         runSubtyping ctx t1 t2 `shouldBe` Right ctx
+
+testForallL = do
+    it "handles forall any" $ do
+        let t1 = Type.PolyAtom Type.Unit
+        let t2 = Type.Forall "a" t1
+        let ctx = [ Context.TypeVar "c" ]
+        runSubtyping ctx t2 t1 `shouldBe` Right ctx
