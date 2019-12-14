@@ -11,6 +11,7 @@ tests = hspec $ do
     describe "Instantiate Left" $ do
         instLReach
         instLSolve
+        instLAllR
 
 instLReach = do
     it "handles InstLReach" $ do
@@ -51,3 +52,19 @@ instLSolve = do
                         Context.TypeVar "z"
                         ]
         instLeft ctx alpha (Type.PolyAtom t) `shouldBe` Right ctxOut
+
+instLAllR = do
+    it "handles InstLSolve" $ do
+        let alpha = 1
+        let ctx = [
+                    Context.TypeVar "x",
+                    Context.UnsolvedExt alpha,
+                    Context.TypeVar "y"
+                    ]
+        let ctxOut = [
+                        Context.TypeVar "x",
+                        Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                        Context.TypeVar "y"
+                        ]
+        let pt = Type.Forall "b" (PolyAtom Type.Unit)
+        instLeft ctx alpha pt `shouldBe` Right ctxOut

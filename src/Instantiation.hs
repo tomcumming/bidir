@@ -1,5 +1,7 @@
 module Instantiation where
 
+import Control.Monad (when)
+
 import qualified Type as Type
 import qualified Context as Context
 import Context (Ctx, splitTwo, splitThree)
@@ -8,7 +10,7 @@ type InstError = String
 
 instLeft :: Ctx -> Type.ExtId -> Type.Poly -> Either InstError Ctx
 instLeft ctx x t = case t of
-    Type.Forall y t -> Left "Forall"
+    Type.Forall y t -> instForallL ctx x y t
     Type.PolyArrow t1 t2 -> Left "Arrow"
     Type.PolyAtom (Type.Ext y) -> instExtExt ctx x y
     Type.PolyAtom t -> instAtom ctx x t
@@ -34,3 +36,15 @@ instAtom ctx x t = case splitTwo (Context.UnsolvedExt x) ctx of
     Just (ctx1, ctx2) -> do
         Context.validate ctx2 (Type.PolyAtom t)
         return $ concat [ctx1, [Context.SolvedExt x (Type.MonoAtom t)], ctx2]
+    Nothing -> Left "instAtom"
+
+instForallL :: Ctx -> Type.ExtId -> Type.Id -> Type.Poly -> Either InstError Ctx
+instForallL ctx x y t = do
+    when (splitTwo (Context.UnsolvedExt x) ctx == Nothing) (Left "instForallL")
+    ctx2 <- instLeft (Context.TypeVar y:ctx) x t
+    (ctx3, ctx4) <- maybe
+        (Left "instForallL tv")
+        Right
+        (splitTwo (Context.TypeVar y) ctx2)
+    return ctx4
+
