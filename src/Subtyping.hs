@@ -16,3 +16,8 @@ subtype ctx t1 t2 = case (t1, t2) of
             (Left "subtype var")
         return ctx
     (Type.PolyAtom Type.Unit, Type.PolyAtom Type.Unit) -> return ctx
+    (Type.PolyAtom (Type.Ext x), Type.PolyAtom (Type.Ext y)) | x == y -> do
+        lift $ when
+            (splitTwo (Context.UnsolvedExt x) ctx == Nothing)
+            (Left "subtype ext")
+        return ctx
