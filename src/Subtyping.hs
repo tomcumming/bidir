@@ -34,3 +34,11 @@ subtype ctx t1 t2 = case (t1, t2) of
             (Set.member x (Type.free t2))
             (Left "subtype ext any occurs")
         instLeft ctx x t2
+    (t1, Type.PolyAtom (Type.Ext x)) -> do
+        lift $ when
+            (splitTwo (Context.UnsolvedExt x) ctx == Nothing)
+            (Left "subtype ext any ctx")
+        lift $ when
+            (Set.member x (Type.free t1))
+            (Left "subtype ext any occurs")
+        instRight ctx t1 x

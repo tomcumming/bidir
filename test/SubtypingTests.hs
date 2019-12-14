@@ -18,6 +18,7 @@ tests = hspec $ do
         testExtExt
         testArrow
         testInstL
+        testInstR
 
 testUnitUnit = it "handles unit unit" $ do
     let ctx = [Context.TypeVar "a"]
@@ -86,3 +87,27 @@ testInstL = do
             let t1 = Type.PolyAtom (Type.Ext alpha)
             let t2 = Type.PolyAtom Type.Unit
             runSubtyping ctx t1 t2 `shouldBe` Right ctxOut
+
+testInstR = do
+    context "when subtyping any ext" $ do
+        it "handles occurs" $ do
+            let alpha = 1
+            let ctx = [ Context.UnsolvedExt alpha ]
+            let t1 = Type.PolyAtom (Type.Ext alpha)
+            let t2 = Type.PolyArrow t1 t1
+            runSubtyping ctx t2 t1 `shouldSatisfy` isLeft
+        it "handles good case" $ do
+            let alpha = 1
+            let ctx = [
+                        Context.TypeVar "a",
+                        Context.UnsolvedExt alpha,
+                        Context.TypeVar "b"
+                        ]
+            let ctxOut = [
+                            Context.TypeVar "a",
+                            Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                            Context.TypeVar "b"
+                            ]
+            let t1 = Type.PolyAtom (Type.Ext alpha)
+            let t2 = Type.PolyAtom Type.Unit
+            runSubtyping ctx t2 t1 `shouldBe` Right ctxOut
