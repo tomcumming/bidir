@@ -59,9 +59,14 @@ testArrow = do
                     Context.UnsolvedExt beta,
                     Context.TypeVar "b"
                     ]
-        let ctxOut = ctx
+        let ctxOut = [
+                        Context.TypeVar "a",
+                        Context.SolvedExt alpha (Type.MonoAtom (Type.Var "b")),
+                        Context.SolvedExt beta (Type.MonoAtom Type.Unit),
+                        Context.TypeVar "b"
+                        ]
         let t1 = Type.PolyArrow (Type.PolyAtom (Type.Ext alpha)) (Type.PolyAtom Type.Unit)
-        let t2 = Type.PolyArrow (Type.PolyAtom Type.Unit) (Type.PolyAtom (Type.Ext beta))
+        let t2 = Type.PolyArrow (Type.PolyAtom (Type.Var "b")) (Type.PolyAtom (Type.Ext beta))
         runSubtyping ctx t1 t2 `shouldBe` Right ctxOut
 
 testInstL = do
