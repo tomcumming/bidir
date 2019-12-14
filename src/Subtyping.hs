@@ -26,6 +26,13 @@ subtype ctx t1 t2 = case (t1, t2) of
     (Type.PolyArrow t1a t1r, Type.PolyArrow t2a t2r) -> do
         ctx2 <- subtype ctx t2a t1a
         subtype ctx2 (Context.apply ctx2 t1r) (Context.apply ctx2 t2r)
+    (t1, Type.Forall x t2) -> do
+        ctx2 <- subtype (Context.TypeVar x:ctx) t1 t2
+        (_, ctx3) <- lift $ maybe
+            (Left "subtype forallr")
+            Right
+            (splitTwo (Context.TypeVar x) ctx2)
+        return ctx3
     (Type.PolyAtom (Type.Ext x), t2) -> do
         lift $ when
             (splitTwo (Context.UnsolvedExt x) ctx == Nothing)
