@@ -13,9 +13,13 @@ tests = hspec $ do
         instLSolve
         instLAllR
         instLArr
+        instRAllL
 
-runInst :: Context.Ctx -> Type.ExtId -> Type.Poly -> Either String Context.Ctx
-runInst ctx x t = evalStateT (instLeft ctx x t) 10
+runInstL :: Context.Ctx -> Type.ExtId -> Type.Poly -> Either String Context.Ctx
+runInstL ctx x t = evalStateT (instLeft ctx x t) 10
+
+runInstR :: Context.Ctx -> Type.Poly -> Type.ExtId -> Either String Context.Ctx
+runInstR ctx t x = evalStateT (instRight ctx t x) 10
 
 instLReach = do
     it "handles InstLReach" $ do
@@ -35,7 +39,7 @@ instLReach = do
                         Context.UnsolvedExt alpha,
                         Context.TypeVar "z"
                         ]
-        runInst ctx alpha (Type.PolyAtom (Type.Ext beta)) `shouldBe` Right ctxOut
+        runInstL ctx alpha (Type.PolyAtom (Type.Ext beta)) `shouldBe` Right ctxOut
 
 instLSolve = do
     it "handles InstLSolve" $ do
@@ -55,7 +59,7 @@ instLSolve = do
                         Context.TypeVar "a",
                         Context.TypeVar "z"
                         ]
-        runInst ctx alpha (Type.PolyAtom t) `shouldBe` Right ctxOut
+        runInstL ctx alpha (Type.PolyAtom t) `shouldBe` Right ctxOut
 
 instLAllR = do
     it "handles InstLAllR" $ do
@@ -71,7 +75,7 @@ instLAllR = do
                         Context.TypeVar "y"
                         ]
         let pt = Type.Forall "b" (PolyAtom Type.Unit)
-        runInst ctx alpha pt `shouldBe` Right ctxOut
+        runInstL ctx alpha pt `shouldBe` Right ctxOut
 
 instLArr = do
     it "handles InstLArr" $ do
@@ -97,4 +101,21 @@ instLArr = do
                         Context.TypeVar "y"
                         ]
         let pt = Type.PolyArrow (Type.PolyAtom (Type.Var "a")) (Type.PolyAtom Type.Unit)
-        runInst ctx alpha pt `shouldBe` Right ctxOut
+        runInstL ctx alpha pt `shouldBe` Right ctxOut
+
+instRAllL = do
+    it "handles InstRAllL" $ do
+        let alpha = 1
+        let beta = "b"
+        let ctx = [
+                    Context.TypeVar "x",
+                    Context.UnsolvedExt alpha,
+                    Context.TypeVar "y"
+                    ]
+        let ctxOut = [
+                        Context.TypeVar "x",
+                        Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                        Context.TypeVar "y"
+                        ]
+        let pt = Type.Forall beta (Type.PolyAtom Type.Unit)
+        runInstR ctx pt alpha `shouldBe` Right ctxOut

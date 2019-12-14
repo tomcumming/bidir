@@ -1,4 +1,4 @@
-module Instantiation (InstError, instLeft) where
+module Instantiation (InstError, instLeft, instRight) where
 
 import Control.Monad (when)
 import Control.Monad.Trans (lift)
@@ -19,6 +19,7 @@ instLeft ctx x t = case t of
 
 instRight :: Ctx -> Type.Poly -> Type.ExtId -> TI Ctx
 instRight ctx t x = case t of
+    Type.Forall y t -> instRAllL ctx y t x
     Type.PolyAtom (Type.Ext y) -> lift $ instExtExt ctx x y
     Type.PolyAtom t -> lift $ instAtom ctx x t
     _ -> error "todo instR"
@@ -75,3 +76,15 @@ instLArr ctx x t1 t2 = do
                 ++ ctx2
     ctx4 <- instRight ctx3 t1 ta
     instLeft ctx4 tr (Context.apply ctx4 t2)
+
+instRAllL :: Ctx -> Type.Id -> Type.Poly -> Type.ExtId -> TI Ctx
+instRAllL ctx y t x = do
+    lift $ when (splitTwo (Context.UnsolvedExt x) ctx == Nothing) (Left "instRAllL")
+    beta <- fresh
+    let ctx2 = Context.UnsolvedExt beta:Context.Marker beta:ctx
+    ctx3 <- instRight ctx2 (Context.apply ctx2 t) x
+    (_, ctx4) <- lift $ maybe
+        (Left "instRAllL")
+        Right
+        (splitTwo (Context.Marker beta) ctx3)
+    return ctx4
