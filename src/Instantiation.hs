@@ -1,19 +1,21 @@
 module Instantiation where
 
 import Control.Monad (when)
+import Control.Monad.Trans (lift)
 
+import TI
 import qualified Type as Type
 import qualified Context as Context
 import Context (Ctx, splitTwo, splitThree)
 
 type InstError = String
 
-instLeft :: Ctx -> Type.ExtId -> Type.Poly -> Either InstError Ctx
+instLeft :: Ctx -> Type.ExtId -> Type.Poly -> TI Ctx
 instLeft ctx x t = case t of
     Type.Forall y t -> instForallL ctx x y t
-    Type.PolyArrow t1 t2 -> Left "Arrow"
-    Type.PolyAtom (Type.Ext y) -> instExtExt ctx x y
-    Type.PolyAtom t -> instAtom ctx x t
+    Type.PolyArrow t1 t2 -> lift $ Left "Arrow"
+    Type.PolyAtom (Type.Ext y) -> lift $ instExtExt ctx x y
+    Type.PolyAtom t -> lift $ instAtom ctx x t
 
 instExtExt :: Ctx -> Type.ExtId -> Type.ExtId -> Either InstError Ctx
 instExtExt ctx a b = do
@@ -38,11 +40,11 @@ instAtom ctx x t = case splitTwo (Context.UnsolvedExt x) ctx of
         return $ concat [ctx1, [Context.SolvedExt x (Type.MonoAtom t)], ctx2]
     Nothing -> Left "instAtom"
 
-instForallL :: Ctx -> Type.ExtId -> Type.Id -> Type.Poly -> Either InstError Ctx
+instForallL :: Ctx -> Type.ExtId -> Type.Id -> Type.Poly -> TI Ctx
 instForallL ctx x y t = do
-    when (splitTwo (Context.UnsolvedExt x) ctx == Nothing) (Left "instForallL")
+    lift $ when (splitTwo (Context.UnsolvedExt x) ctx == Nothing) (Left "instForallL")
     ctx2 <- instLeft (Context.TypeVar y:ctx) x t
-    (ctx3, ctx4) <- maybe
+    (ctx3, ctx4) <- lift $ maybe
         (Left "instForallL tv")
         Right
         (splitTwo (Context.TypeVar y) ctx2)
