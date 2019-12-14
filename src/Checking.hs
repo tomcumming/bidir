@@ -20,7 +20,13 @@ check ctx e t = case (e, t) of
             Right
             (splitTwo (Context.SolvedVar x t1) ctx2)
         return ctx3
-    (e, Type.Forall x t) -> error "Todo check forall"
+    (e, Type.Forall x t) -> do
+        ctx2 <- check (Context.TypeVar x:ctx) e t
+        (_, ctx3) <- lift $ maybe
+            (Left "check forall")
+            Right
+            (splitTwo (Context.TypeVar "a") ctx2)
+        return ctx3
     (e, t) -> do
         (ctx2, t2) <- infer ctx e
         subtype ctx2 (Context.apply ctx2 t2) (Context.apply ctx2 t)
