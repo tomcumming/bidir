@@ -15,8 +15,16 @@ runChecking ctx e t = evalStateT (check ctx e t) 10
 tests = hspec $ do
     describe "Typechecking" $ do
         testUnit
+        testArrow
 
 testUnit = do
     it "handles unit" $ do
         runChecking [] Expr.Unit (Type.PolyAtom Type.Unit)
             `shouldBe` Right []
+
+testArrow = do
+    it "handles arrow" $ do
+        let ctx = [ Context.TypeVar "a" ]
+        let e = Expr.Abs "x" (Expr.Unit)
+        let t = Type.PolyArrow (Type.PolyAtom Type.Unit) (Type.PolyAtom Type.Unit)
+        runChecking ctx e t `shouldBe` Right ctx
