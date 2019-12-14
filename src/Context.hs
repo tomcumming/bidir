@@ -1,12 +1,13 @@
 module Context where
 
 import qualified Type as Type
+import qualified Expr as Expr
 
 type ContextError = String
 
 data Entry =
     TypeVar Type.Id
-  | SolvedVar Type.Id Type.Poly
+  | SolvedVar Expr.Id Type.Poly
   | UnsolvedExt Type.ExtId
   | SolvedExt Type.ExtId Type.Mono
   | Marker Type.ExtId
@@ -60,3 +61,9 @@ apply ctx t = case ctx of
     (SolvedExt x t2:ctx) -> apply ctx (Type.applySub t x (Type.asPoly t2))
     (_:ctx) -> apply ctx t
     [] -> t
+
+lookup :: Ctx -> Expr.Id -> Maybe Type.Poly
+lookup ctx x = case ctx of
+    (SolvedVar y t:_) | x == y -> Just t
+    (_:ctx) -> Context.lookup ctx x
+    [] -> Nothing

@@ -23,8 +23,14 @@ testUnit = do
             `shouldBe` Right []
 
 testArrow = do
-    it "handles arrow" $ do
-        let ctx = [ Context.TypeVar "a" ]
-        let e = Expr.Abs "x" (Expr.Unit)
-        let t = Type.PolyArrow (Type.PolyAtom Type.Unit) (Type.PolyAtom Type.Unit)
-        runChecking ctx e t `shouldBe` Right ctx
+    context "when checking arrow" $ do
+        it "handles \\x -> ()" $ do
+            let ctx = [ Context.TypeVar "a" ]
+            let e = Expr.Abs "x" (Expr.Unit)
+            let t = Type.PolyArrow (Type.PolyAtom Type.Unit) (Type.PolyAtom Type.Unit)
+            runChecking ctx e t `shouldBe` Right ctx
+        it "handles id" $ do
+            let ctx = [ Context.TypeVar "a" ]
+            let e = Expr.Abs "x" (Expr.Var "x")
+            let t = Type.PolyArrow (Type.PolyAtom Type.Unit) (Type.PolyAtom Type.Unit)
+            runChecking ctx e t `shouldBe` Right ctx

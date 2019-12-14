@@ -1,4 +1,4 @@
-module Subtyping where
+module Subtyping (subtype) where
 
 import Control.Monad (when)
 import Control.Monad.Trans (lift)

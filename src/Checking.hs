@@ -1,4 +1,4 @@
-module Checking where
+module Checking (check) where
 
 import Control.Monad.Trans (lift)
 
@@ -7,6 +7,8 @@ import qualified Expr as Expr
 import qualified Type as Type
 import Context (Ctx, splitTwo)
 import qualified Context as Context
+import Inference
+import Subtyping
 
 check :: Ctx -> Expr.Expr -> Type.Poly -> TI Ctx
 check ctx e t = case (e, t) of
@@ -18,3 +20,7 @@ check ctx e t = case (e, t) of
             Right
             (splitTwo (Context.SolvedVar x t1) ctx2)
         return ctx3
+    (e, Type.Forall x t) -> error "Todo check forall"
+    (e, t) -> do
+        (ctx2, t2) <- infer ctx e
+        subtype ctx2 (Context.apply ctx2 t2) (Context.apply ctx2 t)
