@@ -3,9 +3,9 @@ module InstantiationTests where
 import Test.Hspec
 import Control.Monad.State (evalStateT)
 
-import Instantiation
-import qualified Context as Context
-import Type as Type
+import Bidir.Instantiation
+import qualified Bidir.Context as Context
+import Bidir.Type as Type
 
 tests = hspec $ do
     describe "Instantiate Left" $ do

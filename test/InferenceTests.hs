@@ -4,10 +4,10 @@ import Test.Hspec
 import Control.Monad.State (evalStateT)
 import Data.Either (isLeft)
 
-import Checking
-import qualified Context as Context
-import Type as Type
-import Expr as Expr
+import Bidir.Checking
+import qualified Bidir.Context as Context
+import Bidir.Type as Type
+import Bidir.Expr as Expr
 
 runInference :: Context.Ctx -> Expr.Expr -> Either String (Context.Ctx, Type.Poly)
 runInference ctx e = evalStateT (infer ctx e) 10

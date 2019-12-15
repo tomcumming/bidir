@@ -1,14 +1,14 @@
-module Subtyping (subtype) where
+module Bidir.Subtyping (subtype) where
 
 import Control.Monad (when)
 import Control.Monad.Trans (lift)
 import qualified Data.Set as Set
 
-import Context (Ctx, splitTwo)
-import qualified Context as Context
-import qualified Type as Type
-import TI
-import Instantiation
+import Bidir.Context (Ctx, splitTwo)
+import qualified Bidir.Context as Context
+import qualified Bidir.Type as Type
+import Bidir.TI
+import Bidir.Instantiation
 
 subtype :: Ctx -> Type.Poly -> Type.Poly -> TI Ctx
 subtype ctx t1 t2 = case (t1, t2) of

@@ -4,9 +4,9 @@ import Test.Hspec
 import Control.Monad.State (evalStateT)
 import Data.Either (isLeft)
 
-import Subtyping
-import qualified Context as Context
-import Type as Type
+import Bidir.Subtyping
+import qualified Bidir.Context as Context
+import Bidir.Type as Type
 
 runSubtyping :: Context.Ctx -> Type.Poly -> Type.Poly -> Either String Context.Ctx
 runSubtyping ctx t1 t2 = evalStateT (subtype ctx t1 t2) 10

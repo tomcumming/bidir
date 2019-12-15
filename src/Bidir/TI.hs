@@ -1,8 +1,8 @@
-module TI where
+module Bidir.TI where
 
 import Control.Monad.State
 
-import Type (ExtId)
+import Bidir.Type (ExtId)
 
 type TIError = String
 

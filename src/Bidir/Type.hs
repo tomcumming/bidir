@@ -1,4 +1,4 @@
-module Type where
+module Bidir.Type where
 
 import qualified Data.Set as Set
 

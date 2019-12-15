@@ -1,13 +1,13 @@
-module Checking (check, infer) where
+module Bidir.Checking (check, infer) where
 
 import Control.Monad.Trans (lift)
 
-import TI
-import qualified Expr as Expr
-import qualified Type as Type
-import Context (Ctx, splitTwo)
-import qualified Context as Context
-import Subtyping
+import Bidir.TI
+import qualified Bidir.Expr as Expr
+import qualified Bidir.Type as Type
+import Bidir.Context (Ctx, splitTwo)
+import qualified Bidir.Context as Context
+import Bidir.Subtyping
 
 check :: Ctx -> Expr.Expr -> Type.Poly -> TI Ctx
 check ctx e t = case (e, t) of

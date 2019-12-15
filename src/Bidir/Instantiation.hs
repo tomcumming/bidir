@@ -1,12 +1,12 @@
-module Instantiation (InstError, instLeft, instRight) where
+module Bidir.Instantiation (InstError, instLeft, instRight) where
 
 import Control.Monad (when)
 import Control.Monad.Trans (lift)
 
-import TI
-import qualified Type as Type
-import qualified Context as Context
-import Context (Ctx, splitTwo, splitThree)
+import Bidir.TI
+import qualified Bidir.Type as Type
+import qualified Bidir.Context as Context
+import Bidir.Context (Ctx, splitTwo, splitThree)
 
 type InstError = String
 

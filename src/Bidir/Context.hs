@@ -1,7 +1,7 @@
-module Context where
+module Bidir.Context where
 
-import qualified Type as Type
-import qualified Expr as Expr
+import qualified Bidir.Type as Type
+import qualified Bidir.Expr as Expr
 
 type ContextError = String
 
@@ -65,5 +65,5 @@ apply ctx t = case ctx of
 lookup :: Ctx -> Expr.Id -> Maybe Type.Poly
 lookup ctx x = case ctx of
     (TermVar y t:_) | x == y -> Just t
-    (_:ctx) -> Context.lookup ctx x
+    (_:ctx) -> Bidir.Context.lookup ctx x
     [] -> Nothing

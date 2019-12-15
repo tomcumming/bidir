@@ -1,6 +1,6 @@
-module Expr where
+module Bidir.Expr where
 
-import qualified Type as Type
+import qualified Bidir.Type as Type
 
 type Id = String
 
