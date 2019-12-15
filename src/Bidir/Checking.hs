@@ -71,5 +71,25 @@ inferAp ctx t e = case t of
         tv <- fresh
         let ctx2 = Context.Unsolved tv:ctx
         inferAp ctx2 (Type.applyVarSub t x (Type.PolyAtom (Type.Ext tv))) e
-
+    Type.PolyAtom (Type.Ext x) -> do
+        (ctx1, ctx2) <- lift $ maybe
+            (Left "inferAp")
+            Right
+            (splitTwo (Context.Unsolved x) ctx)
+        ta <- fresh
+        tr <- fresh
+        let ctx3 = ctx1 ++
+                    [Context.Unsolved ta] ++
+                    [Context.Unsolved tr] ++
+                    [Context.Solved
+                        x
+                        (Type.MonoArrow
+                            (Type.MonoAtom (Type.Ext ta))
+                            (Type.MonoAtom (Type.Ext tr)))] ++
+                    ctx2
+        ctx4 <- check ctx3 e (Type.PolyAtom (Type.Ext ta))
+        return (
+            ctx4,
+            Type.PolyArrow (Type.PolyAtom (Type.Ext ta)) (Type.PolyAtom (Type.Ext tr))
+            )
     t -> lift $ Left $ "Can not apply to: " ++ show t
