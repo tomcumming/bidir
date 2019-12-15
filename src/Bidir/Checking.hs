@@ -1,4 +1,4 @@
-module Bidir.Checking (check, infer) where
+module Bidir.Checking (check, infer, inferAp) where
 
 import Control.Monad.Trans (lift)
 
@@ -67,3 +67,9 @@ inferAp ctx t e = case t of
     Type.PolyArrow t1 t2 -> do
         ctx2 <- check ctx e t1
         return (ctx2, t2)
+    Type.Forall x t -> do
+        tv <- fresh
+        let ctx2 = Context.Unsolved tv:ctx
+        inferAp ctx2 (Type.applyVarSub t x (Type.PolyAtom (Type.Ext tv))) e
+
+    t -> lift $ Left $ "Can not apply to: " ++ show t
