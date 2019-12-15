@@ -46,8 +46,8 @@ infer ctx e = case e of
         ta <- fresh
         tr <- fresh
         let ctx2 = Context.TermVar "x" (Type.PolyAtom (Type.Ext ta))
-                    : Context.UnsolvedExt tr
-                    : Context.UnsolvedExt ta
+                    : Context.Unsolved tr
+                    : Context.Unsolved ta
                     : ctx
         ctx3 <- check ctx2 e (Type.PolyAtom (Type.Ext tr))
         (_, ctx4) <- lift $ maybe

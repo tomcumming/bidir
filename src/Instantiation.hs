@@ -26,7 +26,7 @@ instRight ctx t x = case t of
 
 instExtExt :: Ctx -> Type.ExtId -> Type.ExtId -> Either InstError Ctx
 instExtExt ctx a b = do
-    let (ae, be) = (Context.UnsolvedExt a, Context.UnsolvedExt b)
+    let (ae, be) = (Context.Unsolved a, Context.Unsolved b)
     case (splitThree be ae ctx , splitThree ae be ctx) of
         (Just (ctx1, ctx2, ctx3), _) -> Right $ go ctx1 ctx2 ctx3 a b
         (_, Just (ctx1, ctx2, ctx3)) -> Right $ go ctx1 ctx2 ctx3 b a
@@ -34,22 +34,22 @@ instExtExt ctx a b = do
   where
     go ctx1 ctx2 ctx3 a b = concat [
         ctx1,
-        [Context.SolvedExt b (Type.MonoAtom $ Type.Ext a)],
+        [Context.Solved b (Type.MonoAtom $ Type.Ext a)],
         ctx2,
-        [Context.UnsolvedExt a],
+        [Context.Unsolved a],
         ctx3
         ]
 
 instAtom :: Ctx -> Type.ExtId -> Type.Atom -> Either InstError Ctx
-instAtom ctx x t = case splitTwo (Context.UnsolvedExt x) ctx of
+instAtom ctx x t = case splitTwo (Context.Unsolved x) ctx of
     Just (ctx1, ctx2) -> do
         Context.validate ctx2 (Type.PolyAtom t)
-        return $ concat [ctx1, [Context.SolvedExt x (Type.MonoAtom t)], ctx2]
+        return $ concat [ctx1, [Context.Solved x (Type.MonoAtom t)], ctx2]
     Nothing -> Left "instAtom"
 
 instForallL :: Ctx -> Type.ExtId -> Type.Id -> Type.Poly -> TI Ctx
 instForallL ctx x y t = do
-    lift $ when (splitTwo (Context.UnsolvedExt x) ctx == Nothing) (Left "instForallL")
+    lift $ when (splitTwo (Context.Unsolved x) ctx == Nothing) (Left "instForallL")
     ctx2 <- instLeft (Context.TypeVar y:ctx) x t
     (ctx3, ctx4) <- lift $ maybe
         (Left "instForallL tv")
@@ -62,26 +62,26 @@ instLArr ctx x t1 t2 = do
     (ctx1, ctx2) <- lift $ maybe
         (Left "instLArr")
         Right
-        (splitTwo (Context.UnsolvedExt x) ctx)
+        (splitTwo (Context.Unsolved x) ctx)
     ta <- fresh
     tr <- fresh
     let ctx3 = ctx1
-                ++ [Context.SolvedExt
+                ++ [Context.Solved
                     x
                     (Type.MonoArrow
                         (Type.MonoAtom (Type.Ext ta))
                         (Type.MonoAtom (Type.Ext tr)))]
-                ++ [Context.UnsolvedExt ta]
-                ++ [Context.UnsolvedExt tr]
+                ++ [Context.Unsolved ta]
+                ++ [Context.Unsolved tr]
                 ++ ctx2
     ctx4 <- instRight ctx3 t1 ta
     instLeft ctx4 tr (Context.apply ctx4 t2)
 
 instRAllL :: Ctx -> Type.Id -> Type.Poly -> Type.ExtId -> TI Ctx
 instRAllL ctx y t x = do
-    lift $ when (splitTwo (Context.UnsolvedExt x) ctx == Nothing) (Left "instRAllL")
+    lift $ when (splitTwo (Context.Unsolved x) ctx == Nothing) (Left "instRAllL")
     beta <- fresh
-    let ctx2 = Context.UnsolvedExt beta:Context.Marker beta:ctx
+    let ctx2 = Context.Unsolved beta:Context.Marker beta:ctx
     ctx3 <- instRight ctx2 (Type.applyVarSub t y (Type.PolyAtom (Type.Ext beta))) x
     (_, ctx4) <- lift $ maybe
         (Left "instRAllL")
@@ -94,17 +94,17 @@ instRArr ctx t1 t2 x  = do
     (ctx1, ctx2) <- lift $ maybe
         (Left "instRArr")
         Right
-        (splitTwo (Context.UnsolvedExt x) ctx)
+        (splitTwo (Context.Unsolved x) ctx)
     ta <- fresh
     tr <- fresh
     let ctx3 = ctx1
-                ++ [Context.SolvedExt
+                ++ [Context.Solved
                     x
                     (Type.MonoArrow
                         (Type.MonoAtom (Type.Ext ta))
                         (Type.MonoAtom (Type.Ext tr)))]
-                ++ [Context.UnsolvedExt ta]
-                ++ [Context.UnsolvedExt tr]
+                ++ [Context.Unsolved ta]
+                ++ [Context.Unsolved tr]
                 ++ ctx2
     ctx4 <- instLeft ctx3 ta t1
     instRight ctx4 (Context.apply ctx4 t2) tr

@@ -20,7 +20,7 @@ subtype ctx t1 t2 = case (t1, t2) of
     (Type.PolyAtom Type.Unit, Type.PolyAtom Type.Unit) -> return ctx
     (Type.PolyAtom (Type.Ext x), Type.PolyAtom (Type.Ext y)) | x == y -> do
         lift $ when
-            (splitTwo (Context.UnsolvedExt x) ctx == Nothing)
+            (splitTwo (Context.Unsolved x) ctx == Nothing)
             (Left "subtype ext")
         return ctx
     (Type.PolyArrow t1a t1r, Type.PolyArrow t2a t2r) -> do
@@ -28,7 +28,7 @@ subtype ctx t1 t2 = case (t1, t2) of
         subtype ctx2 (Context.apply ctx2 t1r) (Context.apply ctx2 t2r)
     (Type.Forall x t1, t2) -> do
         alpha <- fresh
-        let ctx2 = Context.UnsolvedExt alpha:Context.Marker alpha:ctx
+        let ctx2 = Context.Unsolved alpha:Context.Marker alpha:ctx
         ctx3 <- subtype ctx2 (Type.applyVarSub t1 x (Type.PolyAtom (Type.Ext alpha))) t2
         (_, ctx4) <- lift $ maybe
             (Left "subtype forallL")
@@ -44,7 +44,7 @@ subtype ctx t1 t2 = case (t1, t2) of
         return ctx3
     (Type.PolyAtom (Type.Ext x), t2) -> do
         lift $ when
-            (splitTwo (Context.UnsolvedExt x) ctx == Nothing)
+            (splitTwo (Context.Unsolved x) ctx == Nothing)
             (Left "subtype ext any ctx")
         lift $ when
             (Set.member x (Type.free t2))
@@ -52,7 +52,7 @@ subtype ctx t1 t2 = case (t1, t2) of
         instLeft ctx x t2
     (t1, Type.PolyAtom (Type.Ext x)) -> do
         lift $ when
-            (splitTwo (Context.UnsolvedExt x) ctx == Nothing)
+            (splitTwo (Context.Unsolved x) ctx == Nothing)
             (Left "subtype ext any ctx")
         lift $ when
             (Set.member x (Type.free t1))

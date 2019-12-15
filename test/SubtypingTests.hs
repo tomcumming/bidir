@@ -48,7 +48,7 @@ testExtExt = do
         it "handles in ctx" $ do
             let alpha = 1
             let t = Type.PolyAtom (Type.Ext alpha)
-            let ctx = [Context.TypeVar "b", Context.UnsolvedExt alpha, Context.TypeVar "c"]
+            let ctx = [Context.TypeVar "b", Context.Unsolved alpha, Context.TypeVar "c"]
             runSubtyping ctx t t `shouldBe` Right ctx
 
 testArrow = do
@@ -57,14 +57,14 @@ testArrow = do
         let beta = 2
         let ctx = [
                     Context.TypeVar "a",
-                    Context.UnsolvedExt alpha,
-                    Context.UnsolvedExt beta,
+                    Context.Unsolved alpha,
+                    Context.Unsolved beta,
                     Context.TypeVar "b"
                     ]
         let ctxOut = [
                         Context.TypeVar "a",
-                        Context.SolvedExt alpha (Type.MonoAtom (Type.Var "b")),
-                        Context.SolvedExt beta (Type.MonoAtom Type.Unit),
+                        Context.Solved alpha (Type.MonoAtom (Type.Var "b")),
+                        Context.Solved beta (Type.MonoAtom Type.Unit),
                         Context.TypeVar "b"
                         ]
         let t1 = Type.PolyArrow (Type.PolyAtom (Type.Ext alpha)) (Type.PolyAtom Type.Unit)
@@ -75,7 +75,7 @@ testInstL = do
     context "when subtyping ext any" $ do
         it "handles occurs" $ do
             let alpha = 1
-            let ctx = [ Context.UnsolvedExt alpha ]
+            let ctx = [ Context.Unsolved alpha ]
             let t1 = Type.PolyAtom (Type.Ext alpha)
             let t2 = Type.PolyArrow t1 t1
             runSubtyping ctx t1 t2 `shouldSatisfy` isLeft
@@ -83,12 +83,12 @@ testInstL = do
             let alpha = 1
             let ctx = [
                         Context.TypeVar "a",
-                        Context.UnsolvedExt alpha,
+                        Context.Unsolved alpha,
                         Context.TypeVar "b"
                         ]
             let ctxOut = [
                             Context.TypeVar "a",
-                            Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                            Context.Solved alpha (Type.MonoAtom Type.Unit),
                             Context.TypeVar "b"
                             ]
             let t1 = Type.PolyAtom (Type.Ext alpha)
@@ -99,7 +99,7 @@ testInstR = do
     context "when subtyping any ext" $ do
         it "handles occurs" $ do
             let alpha = 1
-            let ctx = [ Context.UnsolvedExt alpha ]
+            let ctx = [ Context.Unsolved alpha ]
             let t1 = Type.PolyAtom (Type.Ext alpha)
             let t2 = Type.PolyArrow t1 t1
             runSubtyping ctx t2 t1 `shouldSatisfy` isLeft
@@ -107,12 +107,12 @@ testInstR = do
             let alpha = 1
             let ctx = [
                         Context.TypeVar "a",
-                        Context.UnsolvedExt alpha,
+                        Context.Unsolved alpha,
                         Context.TypeVar "b"
                         ]
             let ctxOut = [
                             Context.TypeVar "a",
-                            Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                            Context.Solved alpha (Type.MonoAtom Type.Unit),
                             Context.TypeVar "b"
                             ]
             let t1 = Type.PolyAtom (Type.Ext alpha)

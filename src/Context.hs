@@ -8,8 +8,8 @@ type ContextError = String
 data Entry =
     TypeVar Type.Id
   | TermVar Expr.Id Type.Poly
-  | UnsolvedExt Type.ExtId
-  | SolvedExt Type.ExtId Type.Mono
+  | Unsolved Type.ExtId
+  | Solved Type.ExtId Type.Mono
   | Marker Type.ExtId
   deriving (Eq, Show)
 
@@ -40,8 +40,8 @@ validate ctx t = case t of
                 (\_ -> Right ())
                 (splitTwo (TypeVar x) ctx)
         Type.Ext x -> do
-            let se = hasSolvedExt x ctx
-            case (hasSolvedExt x ctx, splitTwo (UnsolvedExt x) ctx ) of
+            let se = hasSolved x ctx
+            case (hasSolved x ctx, splitTwo (Unsolved x) ctx ) of
                 (True, _) -> Right ()
                 (_, Just _) -> Right ()
                 _ -> Left "validate ext"
@@ -50,15 +50,15 @@ validate ctx t = case t of
         validate ctx t1
         validate ctx t2
 
-hasSolvedExt :: Type.ExtId -> Ctx -> Bool
-hasSolvedExt x ctx = case ctx of
-    (SolvedExt y _:_) | x == y -> True
-    (_:ctx) -> hasSolvedExt x ctx
+hasSolved :: Type.ExtId -> Ctx -> Bool
+hasSolved x ctx = case ctx of
+    (Solved y _:_) | x == y -> True
+    (_:ctx) -> hasSolved x ctx
     [] -> False
 
 apply :: Ctx -> Type.Poly -> Type.Poly
 apply ctx t = case ctx of
-    (SolvedExt x t2:ctx) -> apply ctx (Type.applySub t x (Type.asPoly t2))
+    (Solved x t2:ctx) -> apply ctx (Type.applySub t x (Type.asPoly t2))
     (_:ctx) -> apply ctx t
     [] -> t
 

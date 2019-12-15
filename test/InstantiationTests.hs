@@ -28,16 +28,16 @@ instLReach = do
 
         let ctx = [
                     Context.TypeVar "x",
-                    Context.UnsolvedExt beta,
+                    Context.Unsolved beta,
                     Context.TypeVar "y",
-                    Context.UnsolvedExt alpha,
+                    Context.Unsolved alpha,
                     Context.TypeVar "z"
                     ]
         let ctxOut = [
                         Context.TypeVar "x",
-                        Context.SolvedExt beta (Type.MonoAtom (Type.Ext alpha)),
+                        Context.Solved beta (Type.MonoAtom (Type.Ext alpha)),
                         Context.TypeVar "y",
-                        Context.UnsolvedExt alpha,
+                        Context.Unsolved alpha,
                         Context.TypeVar "z"
                         ]
         runInstL ctx alpha (Type.PolyAtom (Type.Ext beta)) `shouldBe` Right ctxOut
@@ -48,14 +48,14 @@ instLSolve = do
         let t = Type.Var "a"
         let ctx = [
                     Context.TypeVar "x",
-                    Context.UnsolvedExt alpha,
+                    Context.Unsolved alpha,
                     Context.TypeVar "y",
                     Context.TypeVar "a",
                     Context.TypeVar "z"
                     ]
         let ctxOut = [
                         Context.TypeVar "x",
-                        Context.SolvedExt alpha (Type.MonoAtom t),
+                        Context.Solved alpha (Type.MonoAtom t),
                         Context.TypeVar "y",
                         Context.TypeVar "a",
                         Context.TypeVar "z"
@@ -67,12 +67,12 @@ instLAllR = do
         let alpha = 1
         let ctx = [
                     Context.TypeVar "x",
-                    Context.UnsolvedExt alpha,
+                    Context.Unsolved alpha,
                     Context.TypeVar "y"
                     ]
         let ctxOut = [
                         Context.TypeVar "x",
-                        Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                        Context.Solved alpha (Type.MonoAtom Type.Unit),
                         Context.TypeVar "y"
                         ]
         let pt = Type.Forall "b" (PolyAtom Type.Unit)
@@ -85,19 +85,19 @@ instLArr = do
         let freshA = 10
         let ctx = [
                     Context.TypeVar "x",
-                    Context.UnsolvedExt alpha,
+                    Context.Unsolved alpha,
                     Context.TypeVar "a",
                     Context.TypeVar "y"
                     ]
         let ctxOut = [
                         Context.TypeVar "x",
-                        Context.SolvedExt
+                        Context.Solved
                             alpha
                             (Type.MonoArrow
                                 (Type.MonoAtom (Type.Ext freshA))
                                 (Type.MonoAtom (Type.Ext freshR))),
-                        Context.SolvedExt freshA (Type.MonoAtom (Type.Var "a")),
-                        Context.SolvedExt freshR (Type.MonoAtom Type.Unit),
+                        Context.Solved freshA (Type.MonoAtom (Type.Var "a")),
+                        Context.Solved freshR (Type.MonoAtom Type.Unit),
                         Context.TypeVar "a",
                         Context.TypeVar "y"
                         ]
@@ -110,12 +110,12 @@ instRAllL = do
         let beta = "b"
         let ctx = [
                     Context.TypeVar "x",
-                    Context.UnsolvedExt alpha,
+                    Context.Unsolved alpha,
                     Context.TypeVar "y"
                     ]
         let ctxOut = [
                         Context.TypeVar "x",
-                        Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                        Context.Solved alpha (Type.MonoAtom Type.Unit),
                         Context.TypeVar "y"
                         ]
         let pt = Type.Forall beta (Type.PolyAtom Type.Unit)
@@ -128,19 +128,19 @@ instRArr = do
         let freshA = 10
         let ctx = [
                     Context.TypeVar "x",
-                    Context.UnsolvedExt alpha,
+                    Context.Unsolved alpha,
                     Context.TypeVar "a",
                     Context.TypeVar "y"
                     ]
         let ctxOut = [
                         Context.TypeVar "x",
-                        Context.SolvedExt
+                        Context.Solved
                             alpha
                             (Type.MonoArrow
                                 (Type.MonoAtom (Type.Ext freshA))
                                 (Type.MonoAtom (Type.Ext freshR))),
-                        Context.SolvedExt freshA (Type.MonoAtom (Type.Var "a")),
-                        Context.SolvedExt freshR (Type.MonoAtom Type.Unit),
+                        Context.Solved freshA (Type.MonoAtom (Type.Var "a")),
+                        Context.Solved freshR (Type.MonoAtom Type.Unit),
                         Context.TypeVar "a",
                         Context.TypeVar "y"
                         ]

@@ -28,12 +28,12 @@ testAnn = do
         let alpha = 1
         let ctx = [
                     Context.TermVar "x" (Type.PolyAtom (Type.Ext alpha)),
-                    Context.UnsolvedExt alpha,
+                    Context.Unsolved alpha,
                     Context.TypeVar "a"
                     ]
         let ctxOut = [
                         Context.TermVar "x" (Type.PolyAtom (Type.Ext alpha)),
-                        Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
+                        Context.Solved alpha (Type.MonoAtom Type.Unit),
                         Context.TypeVar "a"
                         ]
         runInference ctx (Expr.Ann (Expr.Var "x") (Type.PolyAtom Type.Unit))
@@ -45,8 +45,8 @@ testLambda = do
         let beta = 11
         let ctx = [ Context.TypeVar "a" ]
         let ctxOut = [
-                        Context.SolvedExt beta (Type.MonoAtom Type.Unit),
-                        Context.UnsolvedExt alpha,
+                        Context.Solved beta (Type.MonoAtom Type.Unit),
+                        Context.Unsolved alpha,
                         Context.TypeVar "a"
                         ]
         let e = Expr.Abs "x" Expr.Unit
