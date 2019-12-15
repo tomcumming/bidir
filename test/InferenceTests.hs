@@ -26,12 +26,12 @@ testAnn = do
     it "Infer the type of an annotated expression" $ do
         let alpha = 1
         let ctx = [
-                    Context.SolvedVar "x" (Type.PolyAtom (Type.Ext alpha)),
+                    Context.TermVar "x" (Type.PolyAtom (Type.Ext alpha)),
                     Context.UnsolvedExt alpha,
                     Context.TypeVar "a"
                     ]
         let ctxOut = [
-                        Context.SolvedVar "x" (Type.PolyAtom (Type.Ext alpha)),
+                        Context.TermVar "x" (Type.PolyAtom (Type.Ext alpha)),
                         Context.SolvedExt alpha (Type.MonoAtom Type.Unit),
                         Context.TypeVar "a"
                         ]

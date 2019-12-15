@@ -7,7 +7,7 @@ type ContextError = String
 
 data Entry =
     TypeVar Type.Id
-  | SolvedVar Expr.Id Type.Poly
+  | TermVar Expr.Id Type.Poly
   | UnsolvedExt Type.ExtId
   | SolvedExt Type.ExtId Type.Mono
   | Marker Type.ExtId
@@ -64,6 +64,6 @@ apply ctx t = case ctx of
 
 lookup :: Ctx -> Expr.Id -> Maybe Type.Poly
 lookup ctx x = case ctx of
-    (SolvedVar y t:_) | x == y -> Just t
+    (TermVar y t:_) | x == y -> Just t
     (_:ctx) -> Context.lookup ctx x
     [] -> Nothing

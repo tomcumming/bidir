@@ -13,11 +13,11 @@ check :: Ctx -> Expr.Expr -> Type.Poly -> TI Ctx
 check ctx e t = case (e, t) of
     (Expr.Unit, Type.PolyAtom Type.Unit) -> return ctx
     (Expr.Abs x e, Type.PolyArrow t1 t2) -> do
-        ctx2 <- check (Context.SolvedVar x t1:ctx) e t2
+        ctx2 <- check (Context.TermVar x t1:ctx) e t2
         (_, ctx3) <- lift $ maybe
             (Left "check arrow")
             Right
-            (splitTwo (Context.SolvedVar x t1) ctx2)
+            (splitTwo (Context.TermVar x t1) ctx2)
         return ctx3
     (e, Type.Forall x t) -> do
         ctx2 <- check (Context.TypeVar x:ctx) e t
