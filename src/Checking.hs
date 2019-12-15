@@ -1,4 +1,4 @@
-module Checking (check) where
+module Checking (check, infer) where
 
 import Control.Monad.Trans (lift)
 
@@ -7,7 +7,6 @@ import qualified Expr as Expr
 import qualified Type as Type
 import Context (Ctx, splitTwo)
 import qualified Context as Context
-import Inference
 import Subtyping
 
 check :: Ctx -> Expr.Expr -> Type.Poly -> TI Ctx
@@ -30,3 +29,16 @@ check ctx e t = case (e, t) of
     (e, t) -> do
         (ctx2, t2) <- infer ctx e
         subtype ctx2 (Context.apply ctx2 t2) (Context.apply ctx2 t)
+
+infer :: Ctx -> Expr.Expr -> TI (Ctx, Type.Poly)
+infer ctx e = case e of
+    Expr.Var x -> do
+        t <- lift $ maybe
+            (Left $ "Could not find var: " ++ x)
+            Right
+            (Context.lookup ctx x)
+        return (ctx, t)
+    Expr.Unit -> return (ctx, Type.PolyAtom Type.Unit)
+    Expr.Ann e t -> do
+        ctx2 <- check ctx e t
+        return (ctx2, t)
