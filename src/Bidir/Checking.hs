@@ -58,3 +58,12 @@ infer ctx e = case e of
             ctx4,
             Type.PolyArrow (Type.PolyAtom (Type.Ext ta)) (Type.PolyAtom (Type.Ext tr))
             )
+    Expr.Ap e1 e2 -> do
+        (ctx2, t1) <- infer ctx e1
+        inferAp ctx2 (Context.apply ctx2 t1) e2
+
+inferAp :: Ctx -> Type.Poly -> Expr.Expr -> TI (Ctx, Type.Poly)
+inferAp ctx t e = case t of
+    Type.PolyArrow t1 t2 -> do
+        ctx2 <- check ctx e t1
+        return (ctx2, t2)

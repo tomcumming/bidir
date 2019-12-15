@@ -17,6 +17,7 @@ tests = hspec $ do
         testUnit
         testAnn
         testLambda
+        testAp
 
 testUnit = do
     it "Handles Unit" $ do
@@ -54,3 +55,17 @@ testLambda = do
                     (Type.PolyAtom (Type.Ext alpha))
                     (Type.PolyAtom (Type.Ext beta))
         runInference ctx e `shouldBe` Right (ctxOut, t)
+
+testAp = do
+    it "Infers the type of an application" $ do
+        let alpha = 10
+        let beta = 11
+        let ctx = [ Context.TypeVar "a" ]
+        let ctxOut = [
+                        Context.Solved beta (Type.MonoAtom Type.Unit),
+                        Context.Solved alpha (Type.MonoAtom Type.Unit),
+                        Context.TypeVar "a"
+                        ]
+        let e = Expr.Ap (Expr.Abs "x" Expr.Unit) Expr.Unit
+
+        runInference ctx e `shouldBe` Right (ctxOut, Type.PolyAtom Type.Unit)
