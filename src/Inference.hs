@@ -16,3 +16,4 @@ infer ctx e = case e of
             Right
             (Context.lookup ctx x)
         return (ctx, t)
+    Expr.Unit -> return (ctx, Type.PolyAtom Type.Unit)
